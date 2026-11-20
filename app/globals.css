@@ -36,26 +36,3 @@ body{font-family:"Alexandria","DM Sans",sans-serif;letter-spacing:-.012em}.site-
 @media(max-width:420px){.hero{padding:25px 5% 31px;gap:17px}.hero h1{font-size:clamp(32px,8.7vw,36px);line-height:1.22}.eyebrow{font-size:9px}.hero-actions{gap:11px;margin-top:14px}.hero-proof{gap:6px;margin-top:14px}.hero-proof strong{font-size:8px}.hero-proof small{font-size:7px}.hero-image-wrap{height:clamp(228px,70vw,295px)}.floating-note{padding:8px;left:-11px;bottom:23px}.floating-note strong{font-size:8px}.floating-note small{font-size:7px}.about-visual{min-height:270px}.services-grid{gap:8px}.service-card{min-height:163px;padding:13px 11px 37px}.service-card h3{font-size:10px}.service-card p{font-size:8.5px}.work-grid{grid-template-rows:155px 115px 115px}.footer{display:grid;grid-template-columns:1fr;justify-items:start;gap:13px}.footer-links{flex-wrap:wrap}.copyright{grid-column:auto}}
 @media(max-width:360px){.hero-proof{display:none}.hero h1{font-size:32px}.hero-image-wrap{height:230px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
-
-:root{--pharmacy-green:#16856b;--pharmacy-green-dark:#106b56;--pharmacy-mint:#e8f6ef;--pharmacy-teal:#147f8a}
-.brand-mark{background:linear-gradient(145deg,#35b887 0%,#16856b 58%,#106b56 100%);box-shadow:0 9px 22px #16856b35}
-.nav-links a:after{background:linear-gradient(90deg,#27aa7e,#147f8a)}
-.hero{background:radial-gradient(ellipse at 83% 35%,#def4eb 0,transparent 35%),radial-gradient(ellipse at 4% 100%,#eaf7f4 0,transparent 30%),linear-gradient(130deg,#fff 43%,#f1faf6 100%)}
-.eyebrow,.section-kicker{color:#16775f}
-.eyebrow-icon{background:#e1f4eb;color:#16856b}
-.hero h1 span,.about h2 span,.section-heading h2 span,.work-heading h2 span{color:#16856b}
-.hero h1 span:after{border-color:#38b68b}
-.button-primary{background:linear-gradient(115deg,#16856b,#147f8a);box-shadow:0 9px 24px #16856b38}
-.button-primary:hover{background:linear-gradient(115deg,#106b56,#116f79);transform:translateY(-2px)}
-.proof-avatars span:nth-child(3){background:#def2e8;color:#16775f}
-.trust-strip{background:linear-gradient(90deg,#eff8f3,#fff 48%,#eff8f7)}
-.service-icon{background:#e7f5ed;color:#16856b}
-.service-card:nth-child(4n+2) .service-icon{background:#e4f5f5;color:#147f8a}
-.service-card:nth-child(4n+3) .service-icon{background:#f9eaf1;color:#bf3974}
-.service-card:nth-child(4n) .service-icon{background:#eef2df;color:#758b35}
-.service-card:hover{border-color:#b8e2d1;box-shadow:0 14px 34px #16856b1b}
-.service-card:hover>a{background:#16856b}
-.contact-band{background:linear-gradient(110deg,#105d4d,#147b66 57%,#147f8a)}
-.contact-orb{color:#baf0d7}
-.contact-button{color:#12624f}
-.floating-whatsapp{background:#16856b;box-shadow:0 7px 20px #16835c50}
