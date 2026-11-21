@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, ArrowUpLeft, BadgeCheck, Boxes, BriefcaseBusiness, Check, Cross, HeartPulse, Layers3, Menu, MessageCircle, PackageCheck, Palette, Phone, ShieldCheck, Sparkles, Stethoscope, Store, UsersRound, X } from 'lucide-react'
+import { ArrowLeft, ArrowUpLeft, BadgeCheck, Boxes, BriefcaseBusiness, Check, Cross, Layers3, Menu, MessageCircle, Palette, Phone, Sparkles, Stethoscope, UsersRound, X } from 'lucide-react'
 
 const images = [
   { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5CC5E2B4-B8CD-4477-9471-C5CCE7F2E5DD-SmO9Noz6wYVJcPIz7FMQt8tl0FbMm3.jpeg', alt: 'تنسيق وترتيب رفوف مستحضرات العناية في إحدى الصيدليات', className: 'work-photo work-photo-tall' },
@@ -11,16 +11,11 @@ const images = [
 ]
 
 const services = [
-  { icon: Store, ar: 'تنسيق الفروع', en: 'Branch coordination', copy: 'تنسيق متكامل يضمن تجربة موحّدة ومريحة في كل فرع.', copyEn: 'Consistent, seamless experiences across every branch.' },
-  { icon: Boxes, ar: 'جرد وتنظيم المخزون', en: 'Inventory management', copy: 'إدارة دقيقة للمخزون تقلّل الهدر وتدعم نمو المبيعات.', copyEn: 'Precise inventory control that reduces waste and supports growth.' },
-  { icon: UsersRound, ar: 'تدريب الكادر البشري', en: 'Team training', copy: 'نطوّر مهارات فريقك ليقدم خدمة استثنائية بثقة.', copyEn: 'We equip your team to deliver exceptional service with confidence.' },
-  { icon: Layers3, ar: 'تطوير السلاسل', en: 'Chain development', copy: 'خطط تشغيل وتوسّع عملية تناسب طموح علامتك.', copyEn: 'Practical operating and expansion plans for your ambition.' },
+  { icon: Layers3, ar: 'تطوير وتنسيق الفروع والسلاسل', en: 'Branch & chain development', copy: 'تنسيق متكامل للفروع وخطط تشغيل وتوسّع عملية، برؤية واضحة وقرارات مدروسة لخطوتك القادمة.', copyEn: 'Integrated branch coordination with practical operating and expansion plans — clear direction for your next step.' },
+  { icon: Boxes, ar: 'إدارة المخزون والتوريد', en: 'Inventory & supply management', copy: 'إدارة دقيقة للمخزون واختيارات مدروسة من المستحضرات والمستلزمات — تقلّل الهدر وتدعم نمو المبيعات.', copyEn: 'Precise inventory control and thoughtful product selection that reduce waste and grow sales.' },
+  { icon: UsersRound, ar: 'تدريب الكادر وضمان الجودة', en: 'Team training & quality assurance', copy: 'نطوّر مهارات فريقك ليقدم خدمة استثنائية بثقة، بمعايير متابعة مستمرة تحافظ على أفضل مستوى.', copyEn: 'We equip your team to deliver exceptional service with confidence, under ongoing standards that keep it at its best.' },
   { icon: Palette, ar: 'التصميم والديكور', en: 'Design & interiors', copy: 'مساحات صيدلانية عصرية تجمع بين الجمال والوظيفة.', copyEn: 'Contemporary pharmacy spaces that balance beauty and function.' },
-  { icon: Sparkles, ar: 'الاستشارات والتطوير', en: 'Consulting & growth', copy: 'رؤية واضحة وقرارات مدروسة لخطوتك القادمة.', copyEn: 'Clear direction and informed decisions for what comes next.' },
-  { icon: MessageCircle, ar: 'التسويق والدعاية', en: 'Marketing & advertising', copy: 'نصنع حضوراً مميزاً يقرّب صيدليتك من مجتمعها.', copyEn: 'Distinctive campaigns that bring your pharmacy closer to its community.' },
-  { icon: PackageCheck, ar: 'مستحضرات ومستلزمات', en: 'Beauty & medical supplies', copy: 'اختيارات مدروسة من المستحضرات والمستلزمات الطبية.', copyEn: 'Thoughtful selections of beauty products and medical supplies.' },
-  { icon: HeartPulse, ar: 'الفعاليات الطبية', en: 'Medical events', copy: 'فعاليات تثقيفية تبني الثقة وتعزّز التواصل.', copyEn: 'Educational events that build trust and meaningful connections.' },
-  { icon: ShieldCheck, ar: 'متابعة الجودة', en: 'Quality assurance', copy: 'معايير متابعة مستمرة تحافظ على أفضل مستوى للخدمة.', copyEn: 'Ongoing standards that keep your service at its best.' },
+  { icon: MessageCircle, ar: 'التسويق والدعاية والفعاليات', en: 'Marketing & medical events', copy: 'حضور مميز يقرّب صيدليتك من مجتمعها، وفعاليات تثقيفية تبني الثقة وتعزّز التواصل.', copyEn: 'Distinctive campaigns that bring your pharmacy closer to its community, and educational events that build trust.' },
 ]
 
 export default function HomePage() {
