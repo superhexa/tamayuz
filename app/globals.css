@@ -90,3 +90,37 @@ body{font-family:"Alexandria","DM Sans",sans-serif;letter-spacing:-.012em}.site-
 @media(max-width:1050px){.services-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.service-card-featured{grid-column:span 2;grid-row:span 2}}
 @media(max-width:720px){.services-section{padding-top:68px;padding-bottom:74px}.services-section .section-heading{align-items:flex-start;flex-direction:column;gap:14px;margin-bottom:23px}.services-section .section-heading>p{max-width:100%}.services-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.service-card{min-height:178px;padding:16px 14px 43px;border-radius:15px}.service-card-featured{grid-column:span 2;grid-row:auto;min-height:215px;padding:22px 20px 52px}.service-card-featured h3{font-size:20px}.service-card-featured p{font-size:11px}.service-icon{width:39px;height:39px;border-radius:13px}.service-card h3{font-size:11px;margin:14px 0 7px}.service-card p{font-size:9px}.service-card>a{width:27px;height:27px;bottom:12px;inset-inline-end:12px}}
 @media(max-width:420px){.service-card{min-height:165px;padding:13px 11px 39px}.service-card-featured{min-height:200px;padding:19px 17px 48px}.services-section .section-heading h2{font-size:27px}}
+
+/* ---- Pink + blue harmony (2026-11-21): rose woven through the blue system ---- */
+:root{--rose:#d72e76;--rose-deep:#c92f70;--rose-soft:#fdeef4}
+::selection{background:#f6d3e2;color:#123a70}
+/* Primary buttons: blue that melts into rose at the edge */
+.button-primary{background:linear-gradient(115deg,#1679bd 0%,#12558e 55%,#b02a68 135%);box-shadow:0 9px 24px #126bb53d}
+.button-primary:hover{background:linear-gradient(115deg,#12619f 0%,#0f4a7d 55%,#9c2458 135%)}
+.header-cta{background:linear-gradient(115deg,#126bb5 0%,#123a70 60%,#8f2258 135%)}
+.header-cta:hover{background:linear-gradient(115deg,#0f5a94 0%,#0e2c50 60%,#7d1d4c 135%)}
+/* Heading accents: blue leading into rose along the reading direction */
+.hero h1 span,.about h2 span,.section-heading h2 span,.work-heading h2 span,.services-section .section-heading h2 span{background:linear-gradient(270deg,#126bb5,#c92f70);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 span:after{border-color:#d72e76}
+/* Kickers turn rose; the services pill gets a rose tint */
+.section-kicker{color:#c92f70}
+.services-section .section-kicker{border-color:#f2c9dc;background:#fff5f9}
+/* Services: rose icon on every 3n+2 card, rose hover ring + arrow */
+.service-card:nth-child(3n+2) .service-icon{background:linear-gradient(145deg,#fdeef4,#fbdcea);color:#c92f70}
+.service-card:hover{border-color:#eec3d6}
+.service-card:hover:before{border-color:#f0c2d6}
+.service-card:hover>a{background:#d72e76}
+.service-card-featured{background:radial-gradient(circle at 88% 18%,#55addb55 0,transparent 32%),radial-gradient(circle at 10% 90%,#d72e764d 0,transparent 45%),linear-gradient(145deg,#124d82,#0b315c 78%)}
+.service-card-featured .service-icon{color:#ffd3e6}
+.service-card-featured:hover>a{background:#d72e76;border-color:#d72e76}
+/* Hero orbit ring turns rose to match its dot */
+.hero-orbit{border-color:#f0c2d6}
+/* About stamp turns rose */
+.about-stamp{color:#c92f70}
+/* Contact band: rose glow in the far corner, rose-tinted orb */
+.contact-band{background:radial-gradient(ellipse at 98% 115%,#d72e7659 0,transparent 46%),linear-gradient(110deg,#0b315c,#12558e 57%,#1479a8)}
+.contact-orb{color:#ffd9e8}
+/* Nav / footer / text links hover rose */
+.nav-links a:hover,.footer-links a:hover,.text-link:hover{color:#c92f70}
+/* Services section fades into the faintest rose */
+.services-section{background:linear-gradient(180deg,#f5f8fa,#fdf7fa)}
