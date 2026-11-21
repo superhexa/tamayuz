@@ -90,3 +90,51 @@ body{font-family:"Alexandria","DM Sans",sans-serif;letter-spacing:-.012em}.site-
 @media(max-width:1050px){.services-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.service-card-featured{grid-column:span 2;grid-row:span 2}}
 @media(max-width:720px){.services-section{padding-top:68px;padding-bottom:74px}.services-section .section-heading{align-items:flex-start;flex-direction:column;gap:14px;margin-bottom:23px}.services-section .section-heading>p{max-width:100%}.services-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.service-card{min-height:178px;padding:16px 14px 43px;border-radius:15px}.service-card-featured{grid-column:span 2;grid-row:auto;min-height:215px;padding:22px 20px 52px}.service-card-featured h3{font-size:20px}.service-card-featured p{font-size:11px}.service-icon{width:39px;height:39px;border-radius:13px}.service-card h3{font-size:11px;margin:14px 0 7px}.service-card p{font-size:9px}.service-card>a{width:27px;height:27px;bottom:12px;inset-inline-end:12px}}
 @media(max-width:420px){.service-card{min-height:165px;padding:13px 11px 39px}.service-card-featured{min-height:200px;padding:19px 17px 48px}.services-section .section-heading h2{font-size:27px}}
+
+/* ---- Services bento redesign (2026-11-21): mosaic grid, cursor spotlight, scroll reveal ---- */
+.services-grid{grid-auto-flow:dense}
+.service-card{opacity:0}
+.service-card.is-visible{opacity:1;animation:serviceReveal .65s cubic-bezier(.2,.7,.2,1) backwards}
+@keyframes serviceReveal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.service-card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(22,130,196,.13),transparent 65%);opacity:0;transition:opacity .35s;pointer-events:none}
+.service-card:hover::after{opacity:1}
+.service-card-featured::after{background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.15),transparent 65%)}
+.service-card h3,.service-card p,.service-top{position:relative;z-index:1}
+.service-number{position:absolute;bottom:12px;inset-inline-start:18px;font-size:56px;line-height:1;font-weight:800;color:#126bb50f;direction:ltr;pointer-events:none;user-select:none}
+.service-card-featured .service-number{bottom:16px;font-size:78px;color:#ffffff14}
+.service-icon{transition:transform .3s cubic-bezier(.2,.7,.2,1),background .3s,color .3s}
+.service-card:hover .service-icon{transform:translateY(-3px) rotate(-5deg) scale(1.07)}
+.service-card-wide{grid-column:span 2}
+.service-card-wide .service-icon{width:48px;height:48px}
+.service-card-wide h3{font-size:15px}
+.service-card-wide p{max-width:430px}
+.service-card-tall{grid-row:span 2;display:flex;flex-direction:column;justify-content:flex-end}
+.service-card-tall .service-icon{width:48px;height:48px}
+.service-card-tall h3{font-size:15px}
+.service-card-tall .service-number{top:16px;bottom:auto;font-size:84px}
+@media(max-width:1050px){
+.service-card-tall{grid-row:auto;display:block}
+.service-card-tall .service-number{top:auto;bottom:12px;font-size:56px}
+}
+@media(max-width:720px){
+.service-card:last-child{grid-column:span 2}
+.service-card-wide p{max-width:100%}
+}
+@media(max-width:560px){
+.services-grid{grid-template-columns:1fr}
+.service-card-wide,.service-card-featured,.service-card:last-child{grid-column:auto}
+.service-card{min-height:0;padding:20px 18px 52px}
+.service-card h3{font-size:13px}
+.service-card p{font-size:11px;line-height:1.9;max-width:100%}
+.service-card-featured{min-height:0;padding:24px 20px 56px}
+.service-card-featured h3{font-size:21px}
+.service-card-featured p{font-size:12px}
+.service-number{font-size:46px}
+.service-card-featured .service-number{font-size:60px}
+}
+@media(prefers-reduced-motion:reduce){
+.service-card{opacity:1}
+.service-card.is-visible{animation:none}
+.service-card::after{display:none}
+.service-card:hover .service-icon{transform:none}
+}

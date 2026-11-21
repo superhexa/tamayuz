@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { ArrowLeft, ArrowUpLeft, BadgeCheck, Boxes, BriefcaseBusiness, Check, Cross, HeartPulse, Layers3, Menu, MessageCircle, PackageCheck, Palette, Phone, ShieldCheck, Sparkles, Stethoscope, Store, UsersRound, X } from 'lucide-react'
 
 const images = [
@@ -28,6 +28,34 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const rtl = !english
   const t = (ar: string, en: string) => english ? en : ar
+
+  // Services bento: scroll-reveal + cursor spotlight (position stored per card)
+  const gridRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const grid = gridRef.current
+    if (!grid) return
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('.service-card'))
+    if (typeof IntersectionObserver === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cards.forEach((card) => card.classList.add('is-visible'))
+      return
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible')
+          io.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.12 })
+    cards.forEach((card) => io.observe(card))
+    return () => io.disconnect()
+  }, [])
+  const handleCardMove = (e: ReactMouseEvent<HTMLElement>) => {
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
+    el.style.setProperty('--mx', `${e.clientX - rect.left}px`)
+    el.style.setProperty('--my', `${e.clientY - rect.top}px`)
+  }
 
   return (
     <main dir={rtl ? 'rtl' : 'ltr'} className="site-shell">
@@ -58,7 +86,7 @@ export default function HomePage() {
 
       <section className="about section-pad" id="about"><div className="about-visual"><div className="about-photo-main"><img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5CC5E2B4-B8CD-4477-9471-C5CCE7F2E5DD-SmO9Noz6wYVJcPIz7FMQt8tl0FbMm3.jpeg" alt={t('تنسيق وترتيب رفوف مستحضرات العناية في إحدى الصيدليات', 'Carefully arranged pharmacy skincare shelves')} /></div><div className="about-photo-small"><img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1B3DBF73-AC26-4654-9627-9FAE61ADC0BB-KmZWdH3sw92PUdOM3JAI1TnQHoaziY.jpeg" alt={t('تنظيم منتجات العناية في صيدلية', 'Organized personal care products in a pharmacy')} /></div><div className="about-stamp"><Cross size={17}/><span>{t('شريكك<br/>للتميّز'.replace('<br/>',' '), 'YOUR PARTNER\nIN GROWTH')}</span></div></div><div className="about-copy"><div className="section-kicker">{t('عن سر التميز', 'ABOUT SAR AL TAMAYOZ')}</div><h2>{t('لسنا مجرد استشاريين.\nنحن', 'More than consultants.\nWe are your')}{' '}<span>{t('شركاء نجاح.', 'growth partners.')}</span></h2><p>{t('سر التميز شركة أردنية متخصصة في تطوير وإدارة الصيدليات. نعمل جنباً إلى جنب مع أصحاب الصيدليات لنحوّل التحديات اليومية إلى فرص حقيقية للنمو والتميّز.', 'Sar Al Tamayoz is a Jordanian pharmacy development and management company. We work alongside pharmacy owners to turn everyday challenges into real opportunities for growth.')}</p><div className="about-points"><div><span className="point-check"><Check size={14}/></span>{t('حلول مصممة حسب احتياجك', 'Solutions tailored to your needs')}</div><div><span className="point-check"><Check size={14}/></span>{t('متابعة عملية على أرض الواقع', 'Hands-on, practical follow-through')}</div><div><span className="point-check"><Check size={14}/></span>{t('شريك يفهم السوق المحلي', 'A partner who knows the local market')}</div></div><div className="founder"><div className="founder-monogram">أ</div><div><strong>{t('أحمد التميمي', 'Ahmad Al-Tamimi')}</strong><small>{t('المالك والمسؤول الرئيسي', 'Owner & Managing Director')}</small></div><a href="tel:0790967743" aria-label={t('اتصل بأحمد التميمي', 'Call Ahmad Al-Tamimi')}><Phone size={17}/></a></div></div></section>
 
-      <section className="services-section section-pad" id="services"><div className="section-heading"><div><div className="section-kicker">{t('حلول متكاملة لصيدليتك', 'COMPLETE PHARMACY SOLUTIONS')}</div><h2>{t('كل ما تحتاجه،', 'Everything you need,')}{' '}<span>{t('في مكان واحد.', 'all in one place.')}</span></h2></div><p>{t('من التفاصيل اليومية إلى الرؤية بعيدة المدى — نساعد صيدليتك على العمل بشكل أفضل.', 'From everyday details to the bigger picture, we help your pharmacy work better.')}</p></div><div className="services-grid">{services.map((service, i) => { const Icon = service.icon; return <article className={`service-card${i === 0 ? ' service-card-featured' : ''}`} key={service.en}><div className="service-top"><span className="service-icon"><Icon size={20} strokeWidth={1.8}/></span><span className="service-number">{String(i + 1).padStart(2, '0')}</span></div><h3>{t(service.ar, service.en)}</h3><p>{t(service.copy, service.copyEn)}</p><a href="https://wa.me/962790967743" target="_blank" rel="noreferrer" aria-label={`${t('استفسر عن', 'Ask about')} ${t(service.ar, service.en)}`}><ArrowUpLeft size={17}/></a></article> })}</div></section>
+      <section className="services-section section-pad" id="services"><div className="section-heading"><div><div className="section-kicker">{t('حلول متكاملة لصيدليتك', 'COMPLETE PHARMACY SOLUTIONS')}</div><h2>{t('كل ما تحتاجه،', 'Everything you need,')}{' '}<span>{t('في مكان واحد.', 'all in one place.')}</span></h2></div><p>{t('من التفاصيل اليومية إلى الرؤية بعيدة المدى — نساعد صيدليتك على العمل بشكل أفضل.', 'From everyday details to the bigger picture, we help your pharmacy work better.')}</p></div><div className="services-grid" ref={gridRef}>{services.map((service, i) => { const Icon = service.icon; const layout = i === 0 ? ' service-card-featured' : i === 1 || i === 6 ? ' service-card-wide' : i === 4 ? ' service-card-tall' : ''; return <article className={`service-card${layout}`} key={service.en} onMouseMove={handleCardMove} style={{ animationDelay: `${(i % 4) * 70}ms` }}><span className="service-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><div className="service-top"><span className="service-icon"><Icon size={20} strokeWidth={1.8}/></span></div><h3>{t(service.ar, service.en)}</h3><p>{t(service.copy, service.copyEn)}</p><a href="https://wa.me/962790967743" target="_blank" rel="noreferrer" aria-label={`${t('استفسر عن', 'Ask about')} ${t(service.ar, service.en)}`}><ArrowUpLeft size={17}/></a></article> })}</div></section>
 
       <section className="work-section section-pad" id="work"><div className="work-heading"><div><div className="section-kicker">{t('من أرض الواقع', 'ON THE GROUND')}</div><h2>{t('شغلنا يحكي', 'Our work')}{' '}<span>{t('عنّا.', 'speaks for itself.')}</span></h2></div><p>{t('تفاصيل صغيرة، تصنع فرقاً كبيراً في تجربة صيدليتك.', 'Small details make a big difference to your pharmacy experience.')}</p></div><div className="work-grid">{images.map((image, index) => <figure className={`work-card work-card-${index + 1}`} key={image.src}><img className={image.className} src={image.src} alt={image.alt} loading="lazy"/><figcaption><span>{t('مشروع تطوير صيدلية', 'Pharmacy development project')}</span><ArrowUpLeft size={16}/></figcaption></figure>)}</div></section>
 
