@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { useState } from 'react'
 import { ArrowLeft, ArrowUpLeft, BadgeCheck, Boxes, BriefcaseBusiness, Check, Cross, HeartPulse, Layers3, Menu, MessageCircle, PackageCheck, Palette, Phone, ShieldCheck, Sparkles, Stethoscope, Store, UsersRound, X } from 'lucide-react'
 
 const images = [
@@ -10,15 +10,6 @@ const images = [
   { src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/703A244D-EEE2-48F6-B22C-6803EED0B65A-NE7kC821I1dCBOblsxWjWpDzs9Pqzf.jpeg', alt: 'مقارنة توضح تحسين ترتيب أرفف الصيدلية', className: 'work-photo' },
 ]
 
-// Real pharmacy photos reused for the services ledger preview (6 unique shots, cycled across the 10 services)
-const servicePhotos = [
-  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5CC5E2B4-B8CD-4477-9471-C5CCE7F2E5DD-SmO9Noz6wYVJcPIz7FMQt8tl0FbMm3.jpeg',
-  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/41E275BE-CB4F-421A-BCC3-848A7CF83C30-CeeOf3VBQOHkX5NzcidbY6cI47pFIv.jpeg',
-  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/703A244D-EEE2-48F6-B22C-6803EED0B65A-NE7kC821I1dCBOblsxWjWpDzs9Pqzf.jpeg',
-  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/950679A6-98AA-47E4-88ED-F07D446B607F-RhTnTJu5SN1NPHlozGAua574YIjqIV.jpeg',
-  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1B3DBF73-AC26-4654-9627-9FAE61ADC0BB-KmZWdH3sw92PUdOM3JAI1TnQHoaziY.jpeg',
-]
-const servicePhoto = (i: number) => servicePhotos[i % servicePhotos.length]
 const services = [
   { icon: Store, ar: 'تنسيق الفروع', en: 'Branch coordination', copy: 'تنسيق متكامل يضمن تجربة موحّدة ومريحة في كل فرع.', copyEn: 'Consistent, seamless experiences across every branch.' },
   { icon: Boxes, ar: 'جرد وتنظيم المخزون', en: 'Inventory management', copy: 'إدارة دقيقة للمخزون تقلّل الهدر وتدعم نمو المبيعات.', copyEn: 'Precise inventory control that reduces waste and supports growth.' },
@@ -37,58 +28,6 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const rtl = !english
   const t = (ar: string, en: string) => english ? en : ar
-
-  // Services ledger: scroll-reveal + cursor-chasing photo preview + tap accordion
-  const [openService, setOpenService] = useState(0)
-  const [activeService, setActiveService] = useState<number | null>(null)
-  const [revealedRows, setRevealedRows] = useState<ReadonlySet<number>>(new Set())
-  const ledgerRef = useRef<HTMLDivElement>(null)
-  const previewRef = useRef<HTMLDivElement>(null)
-  const previewTarget = useRef({ x: -9999, y: -9999 })
-  const previewCurrent = useRef({ x: -9999, y: -9999 })
-  useEffect(() => {
-    const ledger = ledgerRef.current
-    if (!ledger) return
-    const rows = Array.from(ledger.querySelectorAll<HTMLElement>('.ledger-row'))
-    if (typeof IntersectionObserver === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setRevealedRows(new Set(rows.map((_, i) => i)))
-      return
-    }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const idx = rows.indexOf(entry.target as HTMLElement)
-          if (idx >= 0) setRevealedRows((prev) => { const next = new Set(prev); next.add(idx); return next })
-          io.unobserve(entry.target)
-        }
-      })
-    }, { threshold: 0.1 })
-    rows.forEach((row) => io.observe(row))
-    return () => io.disconnect()
-  }, [])
-  useEffect(() => {
-    if (window.matchMedia('(hover: none), (prefers-reduced-motion: reduce)').matches) return
-    let raf = 0
-    const tick = () => {
-      previewCurrent.current.x += (previewTarget.current.x - previewCurrent.current.x) * 0.14
-      previewCurrent.current.y += (previewTarget.current.y - previewCurrent.current.y) * 0.14
-      const dx = previewTarget.current.x - previewCurrent.current.x
-      const el = previewRef.current
-      if (el) {
-        // Preview floats above the cursor, clamped inside the viewport
-        const w = el.offsetWidth || 270, h = el.offsetHeight || 340
-        const left = Math.max(8, Math.min(window.innerWidth - w - 8, previewCurrent.current.x - w / 2))
-        const top = Math.max(12, previewCurrent.current.y - h - 14)
-        el.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(${Math.max(-7, Math.min(7, dx * 0.05))}deg)`
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
-  const handleLedgerMove = (e: ReactMouseEvent<HTMLElement>) => {
-    previewTarget.current = { x: e.clientX, y: e.clientY }
-  }
 
   return (
     <main dir={rtl ? 'rtl' : 'ltr'} className="site-shell">
@@ -119,39 +58,7 @@ export default function HomePage() {
 
       <section className="about section-pad" id="about"><div className="about-visual"><div className="about-photo-main"><img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5CC5E2B4-B8CD-4477-9471-C5CCE7F2E5DD-SmO9Noz6wYVJcPIz7FMQt8tl0FbMm3.jpeg" alt={t('تنسيق وترتيب رفوف مستحضرات العناية في إحدى الصيدليات', 'Carefully arranged pharmacy skincare shelves')} /></div><div className="about-photo-small"><img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1B3DBF73-AC26-4654-9627-9FAE61ADC0BB-KmZWdH3sw92PUdOM3JAI1TnQHoaziY.jpeg" alt={t('تنظيم منتجات العناية في صيدلية', 'Organized personal care products in a pharmacy')} /></div><div className="about-stamp"><Cross size={17}/><span>{t('شريكك<br/>للتميّز'.replace('<br/>',' '), 'YOUR PARTNER\nIN GROWTH')}</span></div></div><div className="about-copy"><div className="section-kicker">{t('عن سر التميز', 'ABOUT SAR AL TAMAYOZ')}</div><h2>{t('لسنا مجرد استشاريين.\nنحن', 'More than consultants.\nWe are your')}{' '}<span>{t('شركاء نجاح.', 'growth partners.')}</span></h2><p>{t('سر التميز شركة أردنية متخصصة في تطوير وإدارة الصيدليات. نعمل جنباً إلى جنب مع أصحاب الصيدليات لنحوّل التحديات اليومية إلى فرص حقيقية للنمو والتميّز.', 'Sar Al Tamayoz is a Jordanian pharmacy development and management company. We work alongside pharmacy owners to turn everyday challenges into real opportunities for growth.')}</p><div className="about-points"><div><span className="point-check"><Check size={14}/></span>{t('حلول مصممة حسب احتياجك', 'Solutions tailored to your needs')}</div><div><span className="point-check"><Check size={14}/></span>{t('متابعة عملية على أرض الواقع', 'Hands-on, practical follow-through')}</div><div><span className="point-check"><Check size={14}/></span>{t('شريك يفهم السوق المحلي', 'A partner who knows the local market')}</div></div><div className="founder"><div className="founder-monogram">أ</div><div><strong>{t('أحمد التميمي', 'Ahmad Al-Tamimi')}</strong><small>{t('المالك والمسؤول الرئيسي', 'Owner & Managing Director')}</small></div><a href="tel:0790967743" aria-label={t('اتصل بأحمد التميمي', 'Call Ahmad Al-Tamimi')}><Phone size={17}/></a></div></div></section>
 
-      <section className="services-section section-pad" id="services">
-        <div className="section-heading"><div><div className="section-kicker">{t('حلول متكاملة لصيدليتك', 'COMPLETE PHARMACY SOLUTIONS')}</div><h2>{t('كل ما تحتاجه،', 'Everything you need,')}{' '}<span>{t('في مكان واحد.', 'all in one place.')}</span></h2></div><p>{t('من التفاصيل اليومية إلى الرؤية بعيدة المدى — نساعد صيدليتك على العمل بشكل أفضل.', 'From everyday details to the bigger picture, we help your pharmacy work better.')}</p></div>
-        <p className="ledger-hint"><i aria-hidden="true" />{t('مرّر فوق كل خدمة لمعاينتها — واضغط عليها لفتح التفاصيل', 'Hover a service to preview it — tap to open the details')}</p>
-        <div className="services-ledger" ref={ledgerRef} onMouseMove={handleLedgerMove} onMouseLeave={() => setActiveService(null)}>
-          {services.map((service, i) => {
-            const Icon = service.icon
-            const open = openService === i
-            return (
-              <div className={`ledger-row${open ? ' is-open' : ''}${revealedRows.has(i) ? ' is-visible' : ''}`} key={service.en} onMouseEnter={() => setActiveService(i)} style={{ transitionDelay: `${(i % 4) * 60}ms` }}>
-                <button type="button" className="ledger-head" onClick={() => setOpenService(open ? -1 : i)} aria-expanded={open}>
-                  <span className="ledger-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="ledger-title">{t(service.ar, service.en)}</span>
-                  <span className="ledger-icon" aria-hidden="true"><Icon size={20} strokeWidth={1.8} /></span>
-                  <span className="ledger-arrow" aria-hidden="true"><ArrowUpLeft size={18} /></span>
-                </button>
-                <div className="ledger-body">
-                  <div className="ledger-body-inner">
-                    <div className="ledger-body-content">
-                      <img className="ledger-photo" src={servicePhoto(i)} alt="" loading="lazy" />
-                      <p className="ledger-copy">{t(service.copy, service.copyEn)}</p>
-                      <a className="ledger-cta" href="https://wa.me/962790967743" target="_blank" rel="noreferrer">{t('استفسر عن هذه الخدمة', 'Ask about this service')}<ArrowUpLeft size={15} /></a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div className={`ledger-preview${activeService !== null ? ' is-shown' : ''}`} ref={previewRef} aria-hidden="true">
-          <img src={servicePhoto(activeService ?? openService)} alt="" />
-          <span className="ledger-preview-tag">{t(services[activeService ?? openService].ar, services[activeService ?? openService].en)}</span>
-        </div>
-      </section>
+      <section className="services-section section-pad" id="services"><div className="section-heading"><div><div className="section-kicker">{t('حلول متكاملة لصيدليتك', 'COMPLETE PHARMACY SOLUTIONS')}</div><h2>{t('كل ما تحتاجه،', 'Everything you need,')}{' '}<span>{t('في مكان واحد.', 'all in one place.')}</span></h2></div><p>{t('من التفاصيل اليومية إلى الرؤية بعيدة المدى — نساعد صيدليتك على العمل بشكل أفضل.', 'From everyday details to the bigger picture, we help your pharmacy work better.')}</p></div><div className="services-grid">{services.map((service, i) => { const Icon = service.icon; return <article className={`service-card${i === 0 ? ' service-card-featured' : ''}`} key={service.en}><div className="service-top"><span className="service-icon"><Icon size={20} strokeWidth={1.8}/></span><span className="service-number">{String(i + 1).padStart(2, '0')}</span></div><h3>{t(service.ar, service.en)}</h3><p>{t(service.copy, service.copyEn)}</p><a href="https://wa.me/962790967743" target="_blank" rel="noreferrer" aria-label={`${t('استفسر عن', 'Ask about')} ${t(service.ar, service.en)}`}><ArrowUpLeft size={17}/></a></article> })}</div></section>
 
       <section className="work-section section-pad" id="work"><div className="work-heading"><div><div className="section-kicker">{t('من أرض الواقع', 'ON THE GROUND')}</div><h2>{t('شغلنا يحكي', 'Our work')}{' '}<span>{t('عنّا.', 'speaks for itself.')}</span></h2></div><p>{t('تفاصيل صغيرة، تصنع فرقاً كبيراً في تجربة صيدليتك.', 'Small details make a big difference to your pharmacy experience.')}</p></div><div className="work-grid">{images.map((image, index) => <figure className={`work-card work-card-${index + 1}`} key={image.src}><img className={image.className} src={image.src} alt={image.alt} loading="lazy"/><figcaption><span>{t('مشروع تطوير صيدلية', 'Pharmacy development project')}</span><ArrowUpLeft size={16}/></figcaption></figure>)}</div></section>
 
