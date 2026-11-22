@@ -1,0 +1,86 @@
+import { betterAuth } from 'better-auth'
+import { APIError } from 'better-auth/api'
+import { pool } from '@/lib/db'
+
+const adminEmails = new Set(
+  (process.env.ADMIN_EMAILS ?? '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean),
+)
+
+export const auth = betterAuth({
+  database: pool,
+  baseURL:
+    process.env.BETTER_AUTH_URL ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.V0_RUNTIME_URL),
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: true,
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        required: false,
+        defaultValue: 'user',
+        input: false,
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          if (!adminEmails.has(user.email.trim().toLowerCase())) {
+            throw new APIError('FORBIDDEN', {
+              message: 'This email is not authorized to access the admin dashboard.',
+            })
+          }
+          return { data: { ...user, role: 'admin' } }
+        },
+      },
+    },
+  },
+  trustedOrigins: [
+    ...(process.env.NODE_ENV === 'development'
+      ? [
+          'http://localhost:3000',
+          ...(process.env.V0_RUNTIME_URL ? [process.env.V0_RUNTIME_URL] : []),
+          ...(process.env.V0_DEV_APP_URL ? [process.env.V0_DEV_APP_URL] : []),
+          ...(process.env.V0_BUILD_URL ? [process.env.V0_BUILD_URL] : []),
+          ...(process.env.V0_SANDBOX_URL ? [process.env.V0_SANDBOX_URL] : []),
+        ]
+      : []),
+    ...(process.env.NODE_ENV === 'production'
+      ? [
+          ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+          ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
+            ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
+            : []),
+        ]
+      : []),
+  ],
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+  },
+  ...(process.env.NODE_ENV === 'development'
+    ? {
+        advanced: {
+          defaultCookieAttributes: {
+            sameSite: 'none' as const,
+            secure: true,
+          },
+        },
+      }
+    : {}),
+})
+
+export function isAdminEmail(email: string) {
+  return adminEmails.has(email.trim().toLowerCase())
+}
