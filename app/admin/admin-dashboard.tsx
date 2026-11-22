@@ -2,18 +2,22 @@
 
 import { ChangeEvent, FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowUpLeft, Check, ImagePlus, LogOut, Pencil, Plus, Trash2, Upload, X } from 'lucide-react'
+import { ArrowUpLeft, Check, ImagePlus, LogOut, Pencil, Plus, ShieldCheck, Trash2, Upload, UserPlus, Users, X } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import type { AdminMember } from '@/lib/admin-access'
 import type { GalleryCategory, GalleryMedia } from '@/lib/gallery'
 import styles from './admin.module.css'
 
-type Props = { initialCategories: GalleryCategory[]; initialMedia: GalleryMedia[]; email: string }
+type Props = { initialCategories: GalleryCategory[]; initialMedia: GalleryMedia[]; initialAdmins: AdminMember[]; canManageAdmins: boolean; email: string }
 const emptyItem = { title: '', description: '', categoryId: '', mediaType: 'image' as 'image' | 'video', mediaUrl: '', posterUrl: '', stage: 'single' as 'single' | 'before' | 'after', pairKey: '', isPublished: true, sortOrder: 0 }
 
-export default function AdminDashboard({ initialCategories, initialMedia, email }: Props) {
+export default function AdminDashboard({ initialCategories, initialMedia, initialAdmins, canManageAdmins, email }: Props) {
   const router = useRouter()
   const [categories, setCategories] = useState(initialCategories)
   const [media, setMedia] = useState(initialMedia)
+  const [admins, setAdmins] = useState(initialAdmins)
+  const [newAdminEmail, setNewAdminEmail] = useState('')
+  const [adminBusy, setAdminBusy] = useState(false)
   const [item, setItem] = useState(emptyItem)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [categoryName, setCategoryName] = useState('')
@@ -100,13 +104,37 @@ export default function AdminDashboard({ initialCategories, initialMedia, email 
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  async function addAdmin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setAdminBusy(true); setError(''); setMessage('')
+    try {
+      await request('/api/admin/members', { method: 'POST', body: JSON.stringify({ email: newAdminEmail }) })
+      setAdmins(await request('/api/admin/members'))
+      setNewAdminEmail('')
+      setMessage('تمت إضافة المدير. يمكنه إنشاء حسابه باستخدام مفتاح إعداد المدير.')
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'تعذرت إضافة المدير.') }
+    finally { setAdminBusy(false) }
+  }
+
+  async function removeAdmin(member: AdminMember) {
+    if (!member.managed || member.email.toLowerCase() === email.toLowerCase()) return
+    if (!window.confirm(`إزالة صلاحية المدير عن ${member.email}؟`)) return
+    setAdminBusy(true); setError(''); setMessage('')
+    try {
+      await request('/api/admin/members', { method: 'DELETE', body: JSON.stringify({ email: member.email }) })
+      setAdmins(await request('/api/admin/members'))
+      setMessage('تمت إزالة صلاحية المدير.')
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'تعذرت إزالة المدير.') }
+    finally { setAdminBusy(false) }
+  }
+
   async function logout() { await authClient.signOut(); router.replace('/admin/sign-in'); router.refresh() }
 
   return (
     <main className={styles.dashboard}>
       <aside className={styles.sidebar}>
         <a href="/" className={styles.brand}><span className={styles.brandMark}>س</span><span><strong>سر التميز</strong><small>إدارة المحتوى</small></span></a>
-        <nav aria-label="التنقل في لوحة الإدارة"><a href="#overview" className={styles.navActive}>نظرة عامة</a><a href="#media">الصور والفيديوهات</a><a href="#categories">الأقسام</a><a href="/gallery" target="_blank" rel="noreferrer">المعرض العام <ArrowUpLeft size={15} /></a></nav>
+        <nav aria-label="التنقل في لوحة الإدارة"><a href="#overview" className={styles.navActive}>نظرة عامة</a><a href="#media">الصور والفيديوهات</a><a href="#categories">الأقسام</a>{canManageAdmins && <a href="#admins">مديرو الموقع</a>}<a href="/gallery" target="_blank" rel="noreferrer">المعرض العام <ArrowUpLeft size={15} /></a></nav>
         <div className={styles.account}><span className={styles.avatar}>{email.slice(0, 1).toUpperCase()}</span><span className={styles.accountCopy}><strong>مدير المعرض</strong><small>{email}</small></span><button onClick={logout} aria-label="تسجيل الخروج"><LogOut size={17} /></button></div>
       </aside>
       <section className={styles.workspace}>
@@ -137,6 +165,31 @@ export default function AdminDashboard({ initialCategories, initialMedia, email 
           <div className={styles.panelHeading}><div><span className={styles.eyebrow}>المحتوى المحفوظ</span><h2>كل العناصر <span className={styles.count}>{media.length}</span></h2></div></div>
           {media.length ? <div className={styles.mediaList}>{media.map((entry) => <article key={entry.id} className={styles.mediaRow}><div className={styles.thumb}>{entry.mediaType === 'video' ? <video src={entry.mediaUrl} muted preload="metadata" /> : <img src={entry.mediaUrl} alt="" loading="lazy" />}</div><div className={styles.mediaInfo}><strong>{entry.title}</strong><small>{entry.categoryName} · {entry.mediaType === 'video' ? 'فيديو' : 'صورة'} · {entry.stage === 'single' ? 'عادي' : entry.stage === 'before' ? 'قبل' : 'بعد'}</small></div><span className={entry.isPublished ? styles.publishedBadge : styles.draftBadge}>{entry.isPublished ? 'منشور' : 'مسودة'}</span><div className={styles.rowActions}><button onClick={() => editMedia(entry)} aria-label={`تعديل ${entry.title}`}><Pencil size={16} /></button><button onClick={() => deleteMedia(entry)} aria-label={`حذف ${entry.title}`}><Trash2 size={16} /></button></div></article>)}</div> : <div className={styles.empty}><ImagePlus size={24} /><span>لا توجد عناصر بعد. أضف أول صورة أو فيديو من النموذج أعلاه.</span></div>}
         </section>
+        {canManageAdmins && <section className={styles.panel + ' ' + styles.adminPanel} id="admins">
+          <div className={styles.panelHeading}>
+            <div><span className={styles.eyebrow}>الصلاحيات والوصول</span><h2>مديرو الموقع <span className={styles.count}>{admins.length}</span></h2></div>
+            <span className={styles.headingIcon}><Users size={19} /></span>
+          </div>
+          <form className={styles.adminInviteForm} onSubmit={addAdmin}>
+            <label htmlFor="new-admin-email">إضافة مدير جديد</label>
+            <div className={styles.adminInviteControls}>
+              <input id="new-admin-email" type="email" dir="ltr" autoComplete="email" value={newAdminEmail} onChange={(event) => setNewAdminEmail(event.target.value)} placeholder="admin@example.com" required maxLength={254} />
+              <button className={styles.primaryButton} type="submit" disabled={adminBusy}><UserPlus size={16} />{adminBusy ? 'جارٍ التحديث…' : 'إضافة مدير'}</button>
+            </div>
+            <p>بعد الإضافة، يستطيع المدير إنشاء حسابه من صفحة الدخول باستخدام مفتاح إعداد المدير السري.</p>
+          </form>
+          <div className={styles.adminList}>
+            {admins.map((member) => (
+              <article className={styles.adminRow} key={member.email}>
+                <span className={styles.adminAvatar}><ShieldCheck size={16} /></span>
+                <span className={styles.adminIdentity}><strong dir="ltr">{member.email}</strong><small>{member.managed ? `أُضيف في ${member.createdAt?.slice(0, 10) ?? 'حديثاً'}` : 'مُعرّف في إعدادات الموقع'}</small></span>
+                <span className={member.managed ? styles.adminRole : styles.adminRolePrimary}>{member.managed ? 'مدير' : 'أساسي'}</span>
+                {member.managed && member.email.toLowerCase() !== email.toLowerCase() && <button className={styles.removeAdmin} type="button" disabled={adminBusy} onClick={() => removeAdmin(member)} aria-label={`إزالة صلاحية ${member.email}`}><Trash2 size={16} /></button>}
+              </article>
+            ))}
+            {!admins.length && <p className={styles.noAdmins}>لا توجد حسابات مديرة مضافة حتى الآن.</p>}
+          </div>
+        </section>}
         <footer className={styles.dashFooter}>سر التميز <span>•</span> إدارة معرض الأعمال</footer>
       </section>
     </main>

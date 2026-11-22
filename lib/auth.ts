@@ -1,13 +1,7 @@
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
 import { pool } from '@/lib/db'
-
-const adminEmails = new Set(
-  (process.env.ADMIN_EMAILS ?? '')
-    .split(',')
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean),
-)
+import { isAuthorizedAdminEmail } from '@/lib/admin-access'
 
 export const auth = betterAuth({
   database: pool,
@@ -36,7 +30,7 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          if (!adminEmails.has(user.email.trim().toLowerCase())) {
+          if (!(await isAuthorizedAdminEmail(user.email))) {
             throw new APIError('FORBIDDEN', {
               message: 'This email is not authorized to access the admin dashboard.',
             })
@@ -80,7 +74,3 @@ export const auth = betterAuth({
       }
     : {}),
 })
-
-export function isAdminEmail(email: string) {
-  return adminEmails.has(email.trim().toLowerCase())
-}

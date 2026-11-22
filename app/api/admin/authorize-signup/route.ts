@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { isAdminEmail } from '@/lib/auth'
+import { isAuthorizedAdminEmail } from '@/lib/admin-access'
 
 function matchesSecret(candidate: string, secret: string) {
   const candidateBuffer = Buffer.from(candidate)
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   if (!configuredToken || !signingSecret) {
     return NextResponse.json({ error: 'Admin account setup is not configured yet.' }, { status: 503 })
   }
-  if (!email || !isAdminEmail(email) || !matchesSecret(setupToken, configuredToken)) {
+  if (!email || !(await isAuthorizedAdminEmail(email)) || !matchesSecret(setupToken, configuredToken)) {
     return NextResponse.json({ error: 'The email or setup key is not authorized.' }, { status: 403 })
   }
 
